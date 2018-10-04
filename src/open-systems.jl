@@ -77,7 +77,7 @@ function liou2stinespring( r::Matrix{T} ) where T
   return r |> liou2choi |> choi2stinespring
 end
 
-function kraus2liou{T}( k::Vector{Matrix{T}} )
+function kraus2liou( k::Vector{Matrix{T}} ) where T
   l = zeros(T,map(x->x^2,size(k[1])))
   for i in 1:length(k)
     l = l + liou(k[i],k[i]')
