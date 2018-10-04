@@ -22,7 +22,7 @@ trnorm(M::Matrix) = sum(svdvals(M))
 Returns the `(i+1)`th basis element in a `d` dimensional Euclidean space
 as a vector of type `t`.
 """
-function basis_vector{T}( t::Type{T}, i::Int, d::Int )
+function basis_vector( t::Type{T}, i::Int, d::Int ) where T
   result = zeros(T, d)
   result[i+1] = 1
   result
@@ -122,7 +122,7 @@ end
 """
 Computes the partial trace of a matrix `m`.
 """
-function partialtrace{T}( m::Matrix{T}, ds::Vector, dt::Int )
+function partialtrace( m::Matrix{T}, ds::Vector, dt::Int ) where T
   s = size(m)
   l = length(ds);
   if s[1] != s[2]
@@ -163,7 +163,7 @@ end
 """
 Computes a purification of `rho`
 """
-function purify{T}( rho::Matrix{T} )
+function purify( rho::Matrix{T} ) where T
   d = size(rho,1)
   (vals,vecs) = eig(rho)
   psi = zeros(T,d^2)

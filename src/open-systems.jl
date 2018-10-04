@@ -25,8 +25,8 @@ export mat,
        nearestu
 
 mat( v::Vector, r=round(Int,sqrt(length(v))), c=round(Int,sqrt(length(v))) ) = reshape( v, r, c )
-liou{T<:AbstractMatrix}( left::T, right::T ) = kron( transpose(right), left )
-liou{T<:AbstractMatrix}( m::T ) = kron( conj(m), m )
+liou( left::T, right::T ) where T <: AbstractMatrix = kron( transpose(right), left )
+liou( m::T ) where T <: AbstractMatrix = kron( conj(m), m )
 
 function choi_liou_involution( r::Matrix )
   d = round(Int, sqrt(size(r,1)) )
@@ -50,7 +50,7 @@ function liou2choi( r::Matrix )
   choi_liou_involution( r )/sqrt(size(r,1))
 end
 
-function choi2kraus{T}( r::Matrix{T}  )
+function choi2kraus( r::Matrix{T}  ) where T
   (vals,vecs) = eig( sqrt(size(r,1))*r )
   #vals = eigvals( sqrt(size(r,1))*r )
   kraus_ops = Matrix{T}[]
@@ -60,7 +60,7 @@ function choi2kraus{T}( r::Matrix{T}  )
   kraus_ops
 end
 
-function choi2stinespring{T}( r::Matrix{T}  )
+function choi2stinespring( r::Matrix{T}  ) where T
   (vals,vecs) = eig( Hermitian(sqrt(size(r,1))*r) ) # we are assuming Hermiticity-preserving maps
   #vals = eigvals( sqrt(size(r,1))*r )
   A_ops = Matrix{T}[]
@@ -73,7 +73,7 @@ function choi2stinespring{T}( r::Matrix{T}  )
   return sum(A_ops),sum(B_ops)
 end
 
-function liou2stinespring{T}( r::Matrix{T} )
+function liou2stinespring( r::Matrix{T} ) where T
   return r |> liou2choi |> choi2stinespring
 end
 
@@ -89,7 +89,7 @@ function liou2kraus( l::Matrix )
   choi2kraus( liou2choi( l ) )
 end
 
-function kraus2choi{T}( k::Vector{Matrix{T}} )
+function kraus2choi( k::Vector{Matrix{T}} ) where T
   c = zeros(T,map(x->x^2,size(k[1])))
   for i in 1:length(k)
     c = vec(k[i])*vec(k[i])'
@@ -123,7 +123,7 @@ function pauliliou2liou( m::Matrix )
   res
 end
 
-function liou2pauliliou{T}( m::Matrix{T} )
+function liou2pauliliou( m::Matrix{T} ) where T
   if size(m,1) != size(m,2)
     error("Only square matrices supported")
   elseif size(m,1) != 4^(floor(log2(size(m,1))/2))
@@ -157,7 +157,7 @@ Given a superoperator `j` in a Liouville representation, `unitalproj`
 extracts the closest superoperator (in Frobenius norm) that is
 unital. The result may not be completely positive.
 """
-function unitalproj{T}( m::Matrix{T} )
+function unitalproj( m::Matrix{T} ) where T
   d2 = size(m,1)
   d  = round(Int,sqrt(d2))
   id = projector(normalize(vec(eye(d))))
@@ -223,7 +223,7 @@ isliouvillian(m; tol)
 Checks the conditions for a physical Liouvillian matrix (CPTP map generator)
 """
 function isliouvillian(m;tol=0.0)
-    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol 
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
 
     mΓ = choi_liou_involution(m)
     d = round(Int,sqrt(size(m,1)))
